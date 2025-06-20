@@ -1,117 +1,57 @@
-# 创思大模型安全工具 SDK 使用说明
+# 创思大模型安全 MCP
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Node.js Version](https://img.shields.io/node/v/chuangsiai-sdk-js?color=green&label=Node.js%20Version)](https://nodejs.org/en/download/)  
-[![GitHub Repo](https://img.shields.io/badge/GitHub-Repository-blue?logo=github)](https://github.com/chuangsiaihub/chuangsiai-sdk-js)  
-[![npm Version](https://img.shields.io/npm/v/chuangsiai-sdk-js)](https://www.npmjs.com/package/chuangsiai-sdk-js)
+## 官网
+
+https://chuangsiai.com
 
 ## 简介
 
-`chuangsiai-sdk` 创思大模型安全工具是一款面向大语言模型的内容安全防护 SDK，致力于识别和拦截潜在的输入输出风险，确保大模型的使用安全、合规、可信。
+创思大模型安全 MCP（Model Content Protection）是面向大语言模型的内容安全防护系统，通过实时风险识别与拦截，保障大模型应用的安全、合规与可信。
 
-## 主要特性
+**核心能力**：
 
-- 支持输入内容和输出内容的安全检测
-- 支持 Node.js 和浏览器环境（通过 `cross-fetch`）
-- 支持请求超时（兼容 Node 14+，Node 12-14 需 polyfill）
-- 提供完整的 TypeScript 类型定义
-- 同时输出 CommonJS 和 ESM 格式，灵活支持各种项目
+- 输入/输出内容双重安全检测
+- 多维度风险识别（合规/伦理/安全）
+- 低延迟实时防护
+- 可定制策略引擎
 
-## 安装
+## 快速接入
 
-```bash
-npm install chuangsiai-sdk
+在配置文件中添加以下服务配置（支持 SSE 协议）：
 
+```json
+{
+  "mcpServers": {
+    "chuangsiai": {
+      "name": "chuangsiai-mcp",
+      "type": "sse", // 流式传输协议
+      "baseUrl": "https://mcp.chuangsiai.com/sse",
+      "headers": {
+        "Authorization": "【你的API Key】",
+        "StrategyKey": "【你的策略标识】"
+      }
+    }
+  }
+}
 ```
 
-## 快速开始
+## 凭证获取步骤
 
-```js
-import { ChuangsiaiClient } from "chuangsiai-sdk";
+1. 登录 创思安全控制台
+2. 前往「[APIKey 管理](https://console.chuangsiai.com/#/profile/apiKey)」创建 API Key
+3. 在「[策略中心](https://console.chuangsiai.com/#/modelSafety/safeGuard)」获取策略标识
+4. 替换配置中的占位符 【】
 
-// 初始化客户端，支持 API Key 或 AccessKey/SecretKey 认证
-const client = new ChuangsiaiClient({
-  apiKey: "你的API密钥",
-  // 或者 accessKey: 'xxx',
-  // secretKey: 'xxx'
-});
+## 技术特性
 
-// 调用输入安全检测
-client
-  .inputGuardrail({ content: "需要检测的文本内容" })
-  .then((result) => {
-    console.log("输入安全检测结果:", result);
-  })
-  .catch((err) => {
-    console.error("请求失败:", err);
-  });
+- **实时风险识别**：通过实时分析输入和输出内容，快速识别潜在的风险，如违规内容、伦理问题等。
+- **多维度检测**：支持多种风险检测维度，包括但不限于合规性、伦理性和安全性。
+- **低延迟**：采用 HTTPS 传输协议，确保低延迟的实时防护，满足实时性要求。
+- **可定制策略引擎**：提供灵活的策略引擎，支持用户自定义风险检测规则和防护策略。
 
-client
-  .outputGuardrail({ content: "模型生成的回复内容" })
-  .then((result) => {
-    console.log("输出安全检测结果:", result);
-  })
-  .catch((err) => {
-    console.error("请求失败:", err);
-  });
-```
+## 使用场景
 
-## API 参考
-
-#### `new ChuangsiaiClient(authOptions: AuthOptions, options?: SafetyClientOptions)`
-
-创建客户端实例。
-
-- authOptions：认证参数，支持 apiKey 或 accessKey + secretKey
-  - apiKey（可选）：API 密钥
-  - accessKey（可选）：访问密钥
-  - secretKey（可选）：密钥
-- options（可选）：
-  - baseUrl - API 服务地址，默认 `https://api.chuangsiai.com`
-  - timeout - 请求超时时间（毫秒），默认 10000
-
-#### 方法
-
-- `inputGuardrail(payload: GuardrailRequest): Promise<any>`
-  - 输入安全检测
-  - GuardrailRequest：
-    ```ts
-    interface GuardrailRequest {
-      content: string;
-      strategyKey: string;
-    }
-    ```
-- `outputGuardrail(payload: GuardrailRequest): Promise<any>`
-  - 输出安全检测
-  - GuardrailRequest：
-    ```ts
-    interface GuardrailRequest {
-      content: string;
-      strategyKey: string;
-    }
-    ```
-
-## 注意事项
-
-- Node.js 12 - 14 版本需要安装并使用 abort-controller polyfill 支持请求超时功能
-
-## 兼容性
-
-- 目标代码标准为 ES2017，兼容 Node.js 12 及以上版本
-- 浏览器环境支持通过 cross-fetch
-
-## 依赖
-
-- [cross-fetch](https://github.com/github/fetch)
-- [abort-controller](https://github.com/mysticatea/abort-controller)
-
-## 开发与贡献
-
-欢迎提交 PR 和 Issue。
-
-## 许可证
-
-本项目基于 MIT 协议开源。
+- **内容审核**：实时监控和审核输入和输出内容，确保内容符合法律法规和社会主义核心价值观。
 
 ## 📬 联系我们
 
